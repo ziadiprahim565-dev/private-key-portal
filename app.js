@@ -7,64 +7,83 @@ const MAIN_MESSAGE = `اهلا بكم في مشفر
 
 const FINAL_MESSAGE = "[ضع النص الصغير الأخير هنا لاحقًا]";
 
-const messageElement = document.getElementById("mainmessage");
-messageElement.replaceChildren();
-
-const parts = MAIN_MESSAGE.split("2869.84$");
-messageElement.append(document.createTextNode(parts[0]));
-
-const amount = document.createElement("span");
-amount.textContent = "2869.84$";
-amount.className = "highlight-amount";
-messageElement.append(amount);
-messageElement.append(document.createTextNode(parts[1]));
-
-document.getElementById("finalmessage").textContent = FINAL_MESSAGE;
+const get = (id) => document.getElementById(id);
 
 const ids = ["key", "message", "transaction", "final"];
 const bars = [...document.querySelectorAll(".progress i")];
 
 function show(id) {
-  ids.forEach((x, i) => {
-    document.getElementById(x).classList.toggle("active", x === id);
-    bars[i].classList.toggle("on", i <= ids.indexOf(id));
+  ids.forEach((pageId, index) => {
+    const page = get(pageId);
+    if (page) page.classList.toggle("active", pageId === id);
+  });
+
+  bars.forEach((bar, index) => {
+    bar.classList.toggle("on", index <= ids.indexOf(id));
   });
 }
 
-document.getElementById("keyform").addEventListener("submit", e => {
-  e.preventDefault();
-  const err = document.getElementById("keyerror");
-  if (document.getElementById("keyinput").value === ACCESS_KEY) {
-    err.textContent = "";
-    document.getElementById("keyinput").value = "";
+// عرض الرسالة مع تلوين المبلغ بالأزرق
+const messageElement = get("mainmessage");
+
+if (messageElement) {
+  messageElement.replaceChildren();
+
+  const parts = MAIN_MESSAGE.split("2869.84$");
+  messageElement.append(document.createTextNode(parts[0]));
+
+  const amount = document.createElement("span");
+  amount.className = "highlight-amount";
+  amount.textContent = "2869.84$";
+  messageElement.append(amount);
+
+  messageElement.append(
+    document.createTextNode(parts.slice(1).join("2869.84$"))
+  );
+}
+
+if (get("finalmessage")) {
+  get("finalmessage").textContent = FINAL_MESSAGE;
+}
+
+// التحقق من المفتاح
+get("keyform")?.addEventListener("submit", (event) => {
+  event.preventDefault();
+
+  const error = get("keyerror");
+  if (get("keyinput").value === ACCESS_KEY) {
+    error.textContent = "";
+    get("keyinput").value = "";
     show("message");
   } else {
-    err.textContent = "المفتاح غير صحيح. راجع الكتابة وحاول مرة أخرى.";
+    error.textContent = "المفتاح غير صحيح. راجع الكتابة وحاول مرة أخرى.";
   }
 });
 
-document.getElementById("review").onclick = () => show("transaction");
-document.getElementById("backkey").onclick = () => show("key");
-document.getElementById("backmessage").onclick = () => show("message");
+// الانتقال بين الصفحات
+get("review")?.addEventListener("click", () => show("transaction"));
+get("backkey")?.addEventListener("click", () => show("key"));
+get("backmessage")?.addEventListener("click", () => show("message"));
 
-document.getElementById("transform").addEventListener("submit", e => {
-  e.preventDefault();
-  const err = document.getElementById("transerror");
-  if (document.getElementById("transinput").value === TRANSACTION_NUMBER) {
-    err.textContent = "";
-    document.getElementById("transinput").value = "";
+// التحقق من رقم العملية
+get("transform")?.addEventListener("submit", (event) => {
+  event.preventDefault();
+
+  const error = get("transerror");
+  if (get("transinput").value === TRANSACTION_NUMBER) {
+    error.textContent = "";
+    get("transinput").value = "";
     show("final");
   } else {
-    err.textContent = "رقم العملية غير صحيح. حاول مرة أخرى.";
+    error.textContent = "رقم العملية غير صحيح. حاول مرة أخرى.";
   }
 });
 
-document.getElementById("restart").onclick = () => {
-  ["keyinput", "transinput"].forEach(id => {
-    document.getElementById(id).value = "";
-  });
-  ["keyerror", "transerror"].forEach(id => {
-    document.getElementById(id).textContent = "";
-  });
+// العودة للبداية
+get("restart")?.addEventListener("click", () => {
+  get("keyinput").value = "";
+  get("transinput").value = "";
+  get("keyerror").textContent = "";
+  get("transerror").textContent = "";
   show("key");
-};
+});
