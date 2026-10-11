@@ -1,89 +1,137 @@
 
+"use strict";
+
+// بيانات الواجهة التجريبية
 const ACCESS_KEY = "1#7@12/12::W:32/_A5.Zz::22Ex114mQ";
 const TRANSACTION_NUMBER = "396654428266653";
 
-const MAIN_MESSAGE = `اهلا بكم في مشفر
-يرجي دفع المديونيه التي وصلت قيمتها حتي الان الي 2869.84$ وادخال رقم العمليه حتي يتم استلام البينات المخزنه لدينا.`;
+const MAIN_MESSAGE = `أهلاً بكم في مشفر
+هذه واجهة تجريبية لعرض رسالة خاصة.
+المبلغ الظاهر أدناه مثال توضيحي وليس مطالبة مالية حقيقية: 2869.84$`;
 
-const FINAL_MESSAGE = "[ضع النص الصغير الأخير هنا لاحقًا]";
+const FINAL_MESSAGE = "تم المسح بنجاح";
 
 const get = (id) => document.getElementById(id);
 
-const ids = ["key", "message", "transaction", "final"];
+const pageIds = ["key", "message", "transaction", "final"];
 const bars = [...document.querySelectorAll(".progress i")];
 
-function show(id) {
-  ids.forEach((pageId, index) => {
-    const page = get(pageId);
-    if (page) page.classList.toggle("active", pageId === id);
-  });
+// عرض الصفحة وتحديث شريط التقدم
+function show(pageId) {
+  pageIds.forEach((id, index) => {
+    const page = get(id);
+    if (page) {
+      page.classList.toggle("active", id === pageId);
+    }
 
-  bars.forEach((bar, index) => {
-    bar.classList.toggle("on", index <= ids.indexOf(id));
+    if (bars[index]) {
+      bars[index].classList.toggle(
+        "on",
+        index <= pageIds.indexOf(pageId)
+      );
+    }
   });
 }
 
-// عرض الرسالة مع تلوين المبلغ بالأزرق
-const messageElement = get("mainmessage");
+// عرض الرسالة مع تلوين المبلغ
+function renderMainMessage() {
+  const element = get("mainmessage");
+  if (!element) return;
 
-if (messageElement) {
-  messageElement.replaceChildren();
+  element.replaceChildren();
 
-  const parts = MAIN_MESSAGE.split("2869.84$");
-  messageElement.append(document.createTextNode(parts[0]));
+  const amountText = "2869.84$";
+  const parts = MAIN_MESSAGE.split(amountText);
 
-  const amount = document.createElement("span");
-  amount.className = "highlight-amount";
-  amount.textContent = "2869.84$";
-  messageElement.append(amount);
+  parts.forEach((part, index) => {
+    if (part) {
+      element.append(document.createTextNode(part));
+    }
 
-  messageElement.append(
-    document.createTextNode(parts.slice(1).join("2869.84$"))
-  );
+    if (index < parts.length - 1) {
+      const amount = document.createElement("span");
+      amount.className = "highlight-amount";
+      amount.textContent = amountText;
+      element.append(amount);
+    }
+  });
 }
 
-if (get("finalmessage")) {
-  get("finalmessage").textContent = FINAL_MESSAGE;
+// عرض العبارة النهائية
+function renderFinalMessage() {
+  const element = get("finalmessage");
+  if (element) {
+    element.textContent = FINAL_MESSAGE;
+  }
 }
 
 // التحقق من المفتاح
 get("keyform")?.addEventListener("submit", (event) => {
   event.preventDefault();
 
+  const input = get("keyinput");
   const error = get("keyerror");
-  if (get("keyinput").value === ACCESS_KEY) {
+
+  if (!input || !error) return;
+
+  if (input.value === ACCESS_KEY) {
     error.textContent = "";
-    get("keyinput").value = "";
+    input.value = "";
     show("message");
   } else {
-    error.textContent = "المفتاح غير صحيح. راجع الكتابة وحاول مرة أخرى.";
+    error.textContent =
+      "المفتاح غير صحيح. راجع الكتابة وحاول مرة أخرى.";
   }
 });
 
-// الانتقال بين الصفحات
-get("review")?.addEventListener("click", () => show("transaction"));
-get("backkey")?.addEventListener("click", () => show("key"));
-get("backmessage")?.addEventListener("click", () => show("message"));
+// التنقل بين الصفحات
+get("review")?.addEventListener("click", () => {
+  show("transaction");
+});
 
-// التحقق من رقم العملية
+get("backkey")?.addEventListener("click", () => {
+  show("key");
+});
+
+get("backmessage")?.addEventListener("click", () => {
+  show("message");
+});
+
+// التحقق من رقم العملية التجريبي
 get("transform")?.addEventListener("submit", (event) => {
   event.preventDefault();
 
+  const input = get("transinput");
   const error = get("transerror");
-  if (get("transinput").value === TRANSACTION_NUMBER) {
+
+  if (!input || !error) return;
+
+  if (input.value === TRANSACTION_NUMBER) {
     error.textContent = "";
-    get("transinput").value = "";
+    input.value = "";
     show("final");
   } else {
-    error.textContent = "رقم العملية غير صحيح. حاول مرة أخرى.";
+    error.textContent =
+      "رقم العملية غير صحيح. حاول مرة أخرى.";
   }
 });
 
-// العودة للبداية
+// العودة إلى البداية
 get("restart")?.addEventListener("click", () => {
-  get("keyinput").value = "";
-  get("transinput").value = "";
-  get("keyerror").textContent = "";
-  get("transerror").textContent = "";
+  const keyInput = get("keyinput");
+  const transactionInput = get("transinput");
+  const keyError = get("keyerror");
+  const transactionError = get("transerror");
+
+  if (keyInput) keyInput.value = "";
+  if (transactionInput) transactionInput.value = "";
+  if (keyError) keyError.textContent = "";
+  if (transactionError) transactionError.textContent = "";
+
   show("key");
 });
+
+// تشغيل الواجهة
+renderMainMessage();
+renderFinalMessage();
+show("key");
